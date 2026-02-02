@@ -49,10 +49,21 @@ function EditTransactionModal({ isOpen, onClose, onSuccess, transaction, account
     setLoading(true);
 
     try {
-      await transactionService.editTransaction(transaction._id, {
-        ...formData,
-        amount: parseFloat(formData.amount),
-      });
+      // For transfer transactions, only send description and date
+      let updateData;
+      if (isTransfer) {
+        updateData = {
+          description: formData.description,
+          date: formData.date,
+        };
+      } else {
+        updateData = {
+          ...formData,
+          amount: parseFloat(formData.amount),
+        };
+      }
+      
+      await transactionService.editTransaction(transaction._id, updateData);
       onSuccess();
       onClose();
     } catch (err) {
